@@ -1,0 +1,91 @@
+/* ============= ALL ============= */
+@font-face{
+    font-family : Montserrat;
+    src: url('/static/fonts/Montserrat-Regular.ttf');
+}
+
+html {
+    height: 100%;
+    box-sizing: border-box;
+    font-family: Montserrat;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    height: 100%;
+}
+
+a {
+    color : #5aeafa;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+a:visited {
+    color : #5aeafa;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+a:hover {
+    color: #bd5a35;
+    text-decoration:underline;
+}
+
+/* ============= HEADER ============= */
+#header {
+    padding : 20px;
+    height : 100px;
+    background : #46a7b7;
+    font-family: Montserrat;
+    font-size: 40px;
+    color : white;
+    box-shadow: 0 4px 5px #d1d1d1;
+}
+
+#header #provider
+{
+    float : right;
+    font-size : 15px;
+    font-family: Montserrat;
+}
+
+#header #logo {
+    float : left;
+    background: url(/static/media/logo-icon.svg) 0 0 no-repeat;
+    width: 170px;
+    height: 60px;
+    margin-top: 0;
+}
+
+#header #title {
+    clear: both;
+}
+
+/* ============= CONTENT ============= */
+#content {
+    min-height: 90%;
+    padding : 20px;
+}
+
+img.loading-gif{
+  width: 30px;
+  height : 30px;
+  margin : 0px;
+  padding : 0px;
+}
+
+/* ============= FOOTER ============= */
+#footer {
+    position: relative;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    background : #46a7b7;
+    text-align: center;
+    font-size : 14px;
+    box-shadow: 0 -5px 6px #d1d1d1;
+    color : white;
+}

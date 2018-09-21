@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+
+    <script>
+        var total_percent = 0;
+        var done = 0;
+
+        function getSwapStatus (address, percent)
+        {
+            $.ajax({
+                url: '/swap/' + address,
+                type: 'GET',
+                success: function(response) {
+                    var data = JSON.parse(response)
+                    if (data.status == true) {
+                        $("#" + address).replaceWith("<font color='green'>Swapped</font>");
+                        total_percent += percent;
+                        $("#total_percent").html(Number.parseFloat(total_percent).toPrecision(4));
+                    } else {
+                        $("#" + address).replaceWith("<font color='red'><b>No</b></font>");
+                    }
+                    
+                    done++;
+                    $("#done").html(done);
+                },
+                error: function(error) {
+                    console.log (error);
+                }
+            });
+        }
+    </script>
+
+    <h1>ERC20-ICX Swap Progress : <span id="total_percent">0.00</span> % (<span id="done">0</span> / {{holders|length}})</h1>
+    <table cellspacing='0'>
+        <thead>
+            <tr>
+                <th>Rank #</th>
+                <th>Amount ICX</th>
+                <th>% owned</th>
+                <th>% cumul.</th>
+                <th>Address</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for holder in holders %}
+            <tr>
+                <td><center>{{holder.rank}}</center></td>
+                <td><center>{{'%0.2f'| format(holder.amount|float)}}</center></td>
+                <td><center>{{'%0.2f'| format(holder.percent|float)}}%</center></td>
+                <td><center>{{'%0.2f'| format(holder.total_percent|float)}}%</center></td>
+                <td><center><a href="https://etherscan.io/token/0xb5a5f22694352c15b00323844ad545abb2b11028?a=0x{{holder.address}}">0x{{holder.address}}</a></center></td>
+                <td class="loading-td">
+                    <img class="loading-gif" 
+                         id="{{holder.address}}"
+                         src="/static/media/loading.gif" 
+                         onload="getSwapStatus ('{{holder.address}}', {{holder.percent}})"/>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
