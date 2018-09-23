@@ -160,9 +160,25 @@
     </div>
 
     <script>
+        function shuffle (array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
+
+        var holders = [];
         {% for holder in holders %}
-            getSwapStatus ('{{holder.address}}', {{holder.percent}});
+            holders.push ({'address' : '{{holder.address}}', 'percent' : {{holder.percent}}});
         {% endfor %}
+        // Let's shuffle it, only because it looks funnier :D
+        holders = shuffle(holders);
+        holders.map (holder => getSwapStatus(holder['address'], holder['percent']));
     </script>
 
 {% endblock %}
