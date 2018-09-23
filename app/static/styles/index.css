@@ -9,6 +9,13 @@
     padding-left : 100px;
 }
 
+#cells_array_border
+{
+    border : 1px solid black;
+    overflow : auto;
+}
+
 #cells_array a {
-    color : black;
+    color : white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
