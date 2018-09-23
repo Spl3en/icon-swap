@@ -7,6 +7,8 @@
             <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
             <link rel="stylesheet" href="{{url_for('static',filename='styles/table.css')}}">
             <link rel="stylesheet" href="{{url_for('static',filename='styles/layout.css')}}">
+            <link rel="stylesheet" href="{{url_for('static',filename='styles/cells.css')}}">
+            <link rel="stylesheet" href="{{url_for('static',filename='styles/index.css')}}">
         {% endblock %}
     </head>
 
@@ -29,18 +31,18 @@
                 </div>
 
             {% endblock %}
-
+        </div>
+        
+        <div id="footer">
+            {% block footer %}
+                Made with ♥ by <a href="https://twitter.com/Spl3en_ICON">Spl3en</a>
+            {% endblock %}
         </div>
 
         <div id="content">
             {% block content %}{% endblock %}
         </div>        
 
-        <div id="footer">
-            {% block footer %}
-                Made with ♥ by <a href="https://twitter.com/Spl3en_ICON">Spl3en</a>
-            {% endblock %}
-        </div>
 
     </body>
 

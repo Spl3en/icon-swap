@@ -7,60 +7,155 @@
         var total_percent = 0;
         var done = 0;
 
+        function updateDone()
+        {
+            done++;
+            $("#done").html(done);
+        }
+
+        function updatePercent (percent)
+        {
+            total_percent += percent;
+            $("#total_percent").html(Number.parseFloat(total_percent).toPrecision(4));
+        }
+
+        function setSwapStatusOk (address, percent)
+        {
+            updatePercent(percent)
+            updateDone()
+            
+            $("#" + address).replaceWith("<font color='green'>Swapped</font>");
+            $("#cell_" + address).addClass("cell_ok");
+        }
+
+        function setSwapStatusNok (address)
+        {
+            updateDone()
+            $("#" + address).replaceWith("<font color='red'><b>No</b></font>");
+            $("#cell_" + address).addClass("cell_nok");
+        }
+
+        function setSwapStatusError (address)
+        {
+            updateDone()
+            $("#" + address).replaceWith("<font color='red'><b>Error</b></font>");
+        }
+
+        function completeSwapStatus (address, percent, status)
+        {
+            switch (status)
+            {
+                case "OK":
+                    setSwapStatusOk (address, percent)
+                break;
+
+                case "NOK":
+                    setSwapStatusNok (address)
+                break;
+
+                case "ERROR":
+                    setSwapStatusError (address)
+                break;
+            }
+        }
+
         function getSwapStatus (address, percent)
         {
-            $.ajax({
-                url: '/swap/' + address,
-                type: 'GET',
-                success: function(response) {
-                    var data = JSON.parse(response)
-                    if (data.status == true) {
-                        $("#" + address).replaceWith("<font color='green'>Swapped</font>");
-                        total_percent += percent;
-                        $("#total_percent").html(Number.parseFloat(total_percent).toPrecision(4));
-                    } else {
-                        $("#" + address).replaceWith("<font color='red'><b>No</b></font>");
+            if (address == "0000000000000000000000000000000000000000") {
+                // Special case : burn address
+                completeSwapStatus (address, percent, "OK");
+                return;
+            }
+
+            data = "0xcb7bba39000000000000000000000000" + address;
+
+            var payload = `
+                { 
+                    "jsonrpc" : "2.0",
+                    "id" : 1,
+                    "method" : "eth_call",
+                    "params" : [
+                        {
+                            "to" : "0xb5a5f22694352c15b00323844ad545abb2b11028",
+                            "data" : "${data}"
+                        },
+                        "latest"
+                    ]
+                }
+            `;
+
+            $.ajax ({
+                type : "POST",
+                url : "http://node.web3api.com/",
+                dataType : 'json',
+                data : payload,
+
+                success : function (request)
+                {
+                    var swapped = parseInt(request.result, 16);
+
+                    switch (swapped)
+                    {
+                        case 1: // swapped
+                            completeSwapStatus (address, percent, "OK");
+                        break;
+
+                        case 0: // not swapped
+                            completeSwapStatus (address, percent, "NOK");
+                        break;
                     }
-                    
-                    done++;
-                    $("#done").html(done);
                 },
-                error: function(error) {
+
+                error : function (error) {
                     console.log (error);
+                    completeSwapStatus (address, percent, "ERROR")
                 }
             });
         }
     </script>
 
     <h1>ERC20-ICX Swap Progress : <span id="total_percent">0.00</span> % (<span id="done">0</span> / {{holders|length}})</h1>
-    <table cellspacing='0'>
-        <thead>
-            <tr>
-                <th>Rank #</th>
-                <th>Amount ICX</th>
-                <th>% owned</th>
-                <th>% cumul.</th>
-                <th>Address</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for holder in holders %}
-            <tr>
-                <td><center>{{holder.rank}}</center></td>
-                <td><center>{{'%0.2f'| format(holder.amount|float)}}</center></td>
-                <td><center>{{'%0.2f'| format(holder.percent|float)}}%</center></td>
-                <td><center>{{'%0.2f'| format(holder.total_percent|float)}}%</center></td>
-                <td><center><a href="https://etherscan.io/token/0xb5a5f22694352c15b00323844ad545abb2b11028?a=0x{{holder.address}}">0x{{holder.address}}</a></center></td>
-                <td class="loading-td">
-                    <img class="loading-gif" 
-                         id="{{holder.address}}"
-                         src="/static/media/loading.gif" 
-                         onload="getSwapStatus ('{{holder.address}}', {{holder.percent}})"/>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+    <div id="address_listing">
+        <table cellspacing='0'>
+            <thead>
+                <tr>
+                    <th>Rank #</th>
+                    <th>Amount ICX</th>
+                    <th>% owned</th>
+                    <th>% cumul.</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for holder in holders %}
+                <tr>
+                    <td><center>{{holder.rank}}</center></td>
+                    <td><center>{{'%0.2f'| format(holder.amount|float)}}</center></td>
+                    <td><center>{{'%0.2f'| format(holder.percent|float)}}%</center></td>
+                    <td><center>{{'%0.2f'| format(holder.total_percent|float)}}%</center></td>
+                    <td><center><a href="https://etherscan.io/token/0xb5a5f22694352c15b00323844ad545abb2b11028?a=0x{{holder.address}}">0x{{holder.address}}</a></center></td>
+                    <td class="loading-td">
+                        <img class="loading-gif" 
+                             id="{{holder.address}}"
+                             src="/static/media/loading.gif" 
+                             onload="getSwapStatus ('{{holder.address}}', {{holder.percent}})"/>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cells_array">
+            {% for holder in holders %}
+                    <a href="https://etherscan.io/token/0xb5a5f22694352c15b00323844ad545abb2b11028?a=0x{{holder.address}}">
+                        <div id="cell_{{holder.address}}" class="cell cell_unknown {% if loop.index % 25 == 1 %} cell_cr{% endif %}">
+                            <div class="cell_content">{{ loop.index }}</div>
+                        </div>
+                    </a>
+            {% endfor %}
+    </div>
 
 {% endblock %}
