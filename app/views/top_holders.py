@@ -5,7 +5,6 @@ def get_list (holders):
     total_percent = 0
 
     for rank, holder in enumerate(holders):
-        print(holder)
 
         percent = float(holder[3].replace("%", ""))
         total_percent += percent

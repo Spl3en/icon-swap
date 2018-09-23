@@ -12,7 +12,6 @@ def get_list (contractAddress, amount):
             if len(data) >= int(amount):
                 break
             url = 'https://etherscan.io/token/generic-tokenholders2?a=%s&s=4.0022874E%%2b26&p=%d' % (contractAddress, i)
-            print(url)
             req = requests.get(url)
             req.raise_for_status()
         except Exception as e:
