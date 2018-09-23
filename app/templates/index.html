@@ -139,8 +139,7 @@
                     <td class="loading-td">
                         <img class="loading-gif" 
                              id="{{holder.address}}"
-                             src="/static/media/loading.gif" 
-                             onload="getSwapStatus ('{{holder.address}}', {{holder.percent}})"/>
+                             src="/static/media/loading.gif"/>
                     </td>
                 </tr>
             {% endfor %}
@@ -159,5 +158,11 @@
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        {% for holder in holders %}
+            getSwapStatus ('{{holder.address}}', {{holder.percent}});
+        {% endfor %}
+    </script>
 
 {% endblock %}
