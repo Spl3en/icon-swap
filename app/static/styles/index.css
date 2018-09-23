@@ -1,0 +1,14 @@
+#address_listing
+{
+    float : left;
+}
+
+#cells_array
+{
+    float : left;
+    padding-left : 100px;
+}
+
+#cells_array a {
+    color : black;
+}
